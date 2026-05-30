@@ -1,8 +1,31 @@
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+
+import {
+  getFirestore,
+  collection,
+  addDoc,
+  getDocs,
+  deleteDoc,
+  doc
+} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyAcuIK9Bq50IsxPSflo3HILvXSXghZoyyY",
+  authDomain: "aircon-monitoring-system.firebaseapp.com",
+  projectId: "aircon-monitoring-system",
+  storageBucket: "aircon-monitoring-system.firebasestorage.app",
+  messagingSenderId: "887130221420",
+  appId: "1:887130221420:web:af4a548b5c5ecc153ba149",
+  measurementId: "G-KR1YF2CL3G"
+};
+
+const app = initializeApp(firebaseConfig);
+const db = getFirestore(app);
 // =========================
 // AIRCON RECORDS
 // =========================
 console.log("LINE 1");
-let records = JSON.parse(localStorage.getItem("airconRecords")) || [];
+let records = [];
 let editIndex = -1;
 
 // =========================
@@ -61,10 +84,10 @@ const saveData = (photoData) => {
         editIndex = -1;
     }
 
-    localStorage.setItem(
-        "airconRecords",
-        JSON.stringify(records)
-    );
+await addDoc(
+  collection(db, "airconRecords"),
+  record
+);
 
     document
         .querySelectorAll(
@@ -138,7 +161,22 @@ function editRecord(index) {
 // LOAD RECORDS
 // =========================
 
-function loadRecords() {
+async function loadRecords() {
+
+    records = [];
+
+    const snapshot = await getDocs(
+        collection(db, "airconRecords")
+    );
+
+    snapshot.forEach((docSnap) => {
+
+        records.push({
+            id: docSnap.id,
+            ...docSnap.data()
+        });
+
+    });
 
     const table = document.getElementById("recordsTable");
 
