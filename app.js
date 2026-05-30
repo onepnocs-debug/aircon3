@@ -501,3 +501,12 @@ window.addEventListener("click", function (e) {
     }
 
 });
+window.login = login;
+window.logout = logout;
+window.saveRecord = saveRecord;
+window.editRecord = editRecord;
+window.deleteRecord = deleteRecord;
+window.exportPDF = exportPDF;
+window.exportCSV = exportCSV;
+window.loadRecords = loadRecords;
+window.viewImage = viewImage;
