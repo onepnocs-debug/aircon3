@@ -1,7 +1,7 @@
 // =========================
 // AIRCON RECORDS
 // =========================
-
+console.log("LINE 1");
 let records = JSON.parse(localStorage.getItem("airconRecords")) || [];
 let editIndex = -1;
 
@@ -501,6 +501,7 @@ window.addEventListener("click", function (e) {
     }
 
 });
+console.log("REACHED BOTTOM");
 window.login = login;
 window.logout = logout;
 window.saveRecord = saveRecord;
