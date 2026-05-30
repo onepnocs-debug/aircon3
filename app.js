@@ -1,0 +1,503 @@
+// =========================
+// AIRCON RECORDS
+// =========================
+
+let records = JSON.parse(localStorage.getItem("airconRecords")) || [];
+let editIndex = -1;
+
+// =========================
+// SAVE RECORD
+// =========================
+
+function saveRecord() {
+
+
+const file = document.getElementById("photo").files[0];
+
+const existingPhoto =
+    editIndex !== -1
+        ? records[editIndex].photo || ""
+        : "";
+
+const saveData = (photoData) => {
+
+    const record = {
+
+        personnel:
+            document.getElementById("personnel").value,
+
+        brand:
+            document.getElementById("brand").value,
+
+
+        serialNumber:
+            document.getElementById("serialNumber").value,
+
+        location:
+            document.getElementById("location").value,
+
+        inspectionDate:
+            document.getElementById("inspectionDate").value,
+
+        inspector:
+            document.getElementById("inspector").value,
+
+        status:
+            document.getElementById("status").value,
+
+        remarks:
+            document.getElementById("remarks").value,
+
+        photo: photoData
+    };
+
+    if (editIndex === -1) {
+
+        records.push(record);
+
+    } else {
+
+        records[editIndex] = record;
+        editIndex = -1;
+    }
+
+    localStorage.setItem(
+        "airconRecords",
+        JSON.stringify(records)
+    );
+
+    document
+        .querySelectorAll(
+            ".form-container input, .form-container textarea"
+        )
+        .forEach(el => {
+
+            if (el.type !== "file") {
+                el.value = "";
+            }
+
+        });
+
+    document.getElementById("photo").value = "";
+
+    loadRecords();
+
+    alert("Record saved successfully!");
+
+};
+
+if (file) {
+
+    const reader = new FileReader();
+
+    reader.onload = function (e) {
+
+        saveData(e.target.result);
+
+    };
+
+    reader.readAsDataURL(file);
+
+} else {
+
+    saveData(existingPhoto);
+
+}
+
+
+}
+
+
+// =========================
+// EDIT RECORD
+// =========================
+
+function editRecord(index) {
+
+    const record = records[index];
+
+    document.getElementById("personnel").value = record.personnel;
+    document.getElementById("brand").value = record.brand;
+    
+    document.getElementById("serialNumber").value = record.serialNumber;
+    document.getElementById("location").value = record.location;
+    document.getElementById("inspectionDate").value = record.inspectionDate;
+    document.getElementById("inspector").value = record.inspector;
+    document.getElementById("status").value = record.status;
+    document.getElementById("remarks").value = record.remarks;
+
+    editIndex = index;
+
+    window.scrollTo({
+        top: 0,
+        behavior: "smooth"
+    });
+}
+
+// =========================
+// LOAD RECORDS
+// =========================
+
+function loadRecords() {
+
+    const table = document.getElementById("recordsTable");
+
+    if (!table) return;
+
+    const search =
+        document.getElementById("search")
+            ? document.getElementById("search").value.toLowerCase()
+            : "";
+
+    table.innerHTML = "";
+
+    records.forEach((record, index) => {
+
+        const text = JSON.stringify(record).toLowerCase();
+
+        if (text.includes(search)) {
+
+            table.innerHTML += `
+                <tr>
+
+                    <td>${record.inspectionDate || ""}</td>
+
+                    <td>${record.inspector || ""}</td>
+
+                    <td>
+    <span class="${
+        record.status === "Good"
+            ? "status-good"
+            : record.status === "Needs Repair"
+            ? "status-repair"
+            : "status-maintenance"
+    }">
+        ${record.status || ""}
+    </span>
+</td>
+
+                    <td>${record.personnel || ""}</td>
+
+                    <td>${record.location || ""}</td>
+
+                    <td>${record.brand || ""}</td>
+
+                    <td>${record.serialNumber || ""}</td>
+
+                    <td>
+                        ${
+                            record.photo
+                            ? `
+                                <img
+                                    src="${record.photo}"
+                                    class="record-photo"
+                                    onclick="viewImage('${record.photo}')"
+                                >
+                              `
+                            : "No Photo"
+                        }
+                    </td>
+
+                    <td>${record.remarks || ""}</td>
+
+                    <td>
+                        <button
+                            type="button"
+                            onclick="editRecord(${index})">
+                            Edit
+                        </button>
+
+                        <button
+                            type="button"
+                            class="delete-btn"
+                            onclick="deleteRecord(${index})">
+                            Delete
+                        </button>
+                    </td>
+
+                </tr>
+            `;
+        }
+    });
+
+    document.getElementById("totalRecords").textContent =
+        records.length;
+
+    setupPermissions();
+}
+
+// =========================
+// DELETE RECORD
+// =========================
+
+function deleteRecord(index) {
+
+    if (currentUser && currentUser.role === "user") {
+        alert("You do not have permission to delete records.");
+        return;
+    }
+
+    if (confirm("Delete this record?")) {
+
+        records.splice(index, 1);
+
+        localStorage.setItem(
+            "airconRecords",
+            JSON.stringify(records)
+        );
+
+        loadRecords();
+    }
+}
+
+// =========================
+// EXPORT CSV
+// =========================
+
+function exportCSV() {
+
+    let csv =
+"Date,Inspector,Status,Personnel,Brand,Serial Number,Location,Remarks\n";
+
+    records.forEach(r => {
+
+       csv += `"${r.inspectionDate}","${r.inspector}","${r.status}","${r.personnel}","${r.brand}","${r.serialNumber}","${r.location}","${r.remarks}"\n`;
+
+    });
+
+    const blob = new Blob([csv], {
+        type: "text/csv"
+    });
+
+    const a = document.createElement("a");
+
+    a.href = URL.createObjectURL(blob);
+    a.download = "Aircon_Maintenance_Records.csv";
+
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+}
+
+// =========================
+// EXPORT PDF
+// =========================
+
+function exportPDF() {
+
+    const { jsPDF } = window.jspdf;
+
+    const doc = new jsPDF();
+
+    doc.text(
+        "Air Conditioner Maintenance Records",
+        14,
+        15
+    );
+
+   const rows = records.map(r => [
+    r.inspectionDate,
+    r.inspector,
+    r.status,
+    r.personnel,
+    r.location,
+    r.brand,
+    r.serialNumber,
+    r.remarks
+]);
+    doc.autoTable({
+    head: [
+[
+    "Date",
+    "Inspector",
+    "Status",
+    "Person In Charge",
+    "Location",
+    "Brand",
+    "Serial Number",
+    "Remarks"
+]
+],
+        body: rows,
+        startY: 20
+    });
+
+    doc.save(
+        "Aircon_Maintenance_Records.pdf"
+    );
+}
+
+// =========================
+// LOGIN SYSTEM
+// =========================
+
+const accounts = [
+    {
+        username: "admin",
+        password: "admin123",
+        role: "admin"
+    },
+    {
+        username: "user",
+        password: "user123",
+        role: "user"
+    }
+];
+
+let currentUser = null;
+
+function login() {
+
+    const username =
+        document.getElementById("username").value;
+
+    const password =
+        document.getElementById("password").value;
+
+    const account = accounts.find(
+        a =>
+            a.username === username &&
+            a.password === password
+    );
+
+    if (!account) {
+        alert("Invalid Login");
+        return;
+    }
+
+    currentUser = account;
+
+    localStorage.setItem(
+        "currentUser",
+        JSON.stringify(account)
+    );
+
+    document.getElementById(
+        "loginPage"
+    ).style.display = "none";
+
+    document.getElementById(
+        "mainSystem"
+    ).style.display = "block";
+
+    setupPermissions();
+    loadRecords();
+}
+
+function logout() {
+
+    localStorage.removeItem(
+        "currentUser"
+    );
+
+    currentUser = null;
+
+    document.getElementById(
+        "loginPage"
+    ).style.display = "flex";
+
+    document.getElementById(
+        "mainSystem"
+    ).style.display = "none";
+}
+
+// =========================
+// PERMISSIONS
+// =========================
+
+function setupPermissions() {
+
+    if (!currentUser) return;
+
+    const saveBtn = document.querySelector(
+        "button[onclick='saveRecord()']"
+    );
+
+    if (
+        currentUser.role === "user"
+    ) {
+
+        if (saveBtn) {
+            saveBtn.style.display = "none";
+        }
+
+        document
+            .querySelectorAll(".delete-btn")
+            .forEach(btn => {
+                btn.style.display = "none";
+            });
+
+    } else {
+
+        if (saveBtn) {
+            saveBtn.style.display = "inline-block";
+        }
+
+        document
+            .querySelectorAll(".delete-btn")
+            .forEach(btn => {
+                btn.style.display = "inline-block";
+            });
+    }
+}
+
+// =========================
+// PAGE LOAD
+// =========================
+
+window.onload = function () {
+
+    const savedUser = JSON.parse(
+        localStorage.getItem("currentUser")
+    );
+
+    if (savedUser) {
+
+        currentUser = savedUser;
+
+        document.getElementById(
+            "loginPage"
+        ).style.display = "none";
+
+        document.getElementById(
+            "mainSystem"
+        ).style.display = "block";
+
+        setupPermissions();
+
+    } else {
+
+        document.getElementById(
+            "loginPage"
+        ).style.display = "flex";
+
+        document.getElementById(
+            "mainSystem"
+        ).style.display = "none";
+    }
+
+    loadRecords();
+};
+
+function viewImage(src) {
+
+    document.getElementById("imageModal").style.display = "block";
+
+    document.getElementById("fullImage").src = src;
+}
+
+document.querySelector(".close").addEventListener("click", function () {
+
+    document.getElementById("imageModal").style.display = "none";
+
+});
+
+window.addEventListener("click", function (e) {
+
+    const modal = document.getElementById("imageModal");
+
+    if (e.target === modal) {
+        modal.style.display = "none";
+    }
+
+});
