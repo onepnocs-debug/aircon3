@@ -42,7 +42,7 @@ const existingPhoto =
         ? records[editIndex].photo || ""
         : "";
 
-const saveData = (photoData) => {
+async function saveData(photoData) {
 
     const record = {
 
@@ -74,20 +74,12 @@ const saveData = (photoData) => {
         photo: photoData
     };
 
-    if (editIndex === -1) {
-
-        records.push(record);
-
-    } else {
-
-        records[editIndex] = record;
-        editIndex = -1;
-    }
-
-await addDoc(
-  collection(db, "airconRecords"),
-  record
+   await addDoc(
+    collection(db, "airconRecords"),
+    record
 );
+
+
 
     document
         .querySelectorAll(
@@ -268,7 +260,7 @@ async function loadRecords() {
 // DELETE RECORD
 // =========================
 
-function deleteRecord(index) {
+async function deleteRecord(index) {
 
     if (currentUser && currentUser.role === "user") {
         alert("You do not have permission to delete records.");
@@ -277,11 +269,8 @@ function deleteRecord(index) {
 
     if (confirm("Delete this record?")) {
 
-        records.splice(index, 1);
-
-        localStorage.setItem(
-            "airconRecords",
-            JSON.stringify(records)
+        await deleteDoc(
+            doc(db, "airconRecords", records[index].id)
         );
 
         loadRecords();
