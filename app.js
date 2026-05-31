@@ -230,20 +230,24 @@ async function loadRecords() {
 
                     <td>${record.remarks || ""}</td>
 
-                    <td>
-                        <button
-                            type="button"
-                            onclick="editRecord(${index})">
-                            Edit
-                        </button>
+                   <td>
+    <div class="action-buttons">
 
-                        <button
-                            type="button"
-                            class="delete-btn"
-                            onclick="deleteRecord(${index})">
-                            Delete
-                        </button>
-                    </td>
+        <button
+            type="button"
+            onclick="editRecord(${index})">
+            Edit
+        </button>
+
+        <button
+            type="button"
+            class="delete-btn"
+            onclick="deleteRecord(${index})">
+            Delete
+        </button>
+
+    </div>
+</td>
 
                 </tr>
             `;
