@@ -234,8 +234,9 @@ async function loadRecords() {
     <div class="action-buttons">
 
         <button
-            type="button"
-            onclick="editRecord(${index})">
+    type="button"
+    class="edit-btn"
+    onclick="editRecord(${index})">
             Edit
         </button>
 
@@ -417,59 +418,131 @@ function login() {
 
 function logout() {
 
-    localStorage.removeItem(
-        "currentUser"
-    );
+    currentUser = {
+        username: "user",
+        role: "user"
+    };
 
-    currentUser = null;
-
-    document.getElementById(
-        "loginPage"
-    ).style.display = "flex";
+    setupPermissions();
 
     document.getElementById(
-        "mainSystem"
-    ).style.display = "none";
+        "adminBtn"
+    ).innerText =
+        "Run as Administrator";
+
+    loadRecords();
+
+}
+  function showAdminLogin() {
+
+    document.getElementById(
+        "adminModal"
+    ).style.display = "block";
+
 }
 
+function closeAdminLogin() {
+
+    document.getElementById(
+        "adminModal"
+    ).style.display = "none";
+
+}
+
+function adminLogin() {
+
+    const username =
+        document.getElementById(
+            "adminUsername"
+        ).value;
+
+    const password =
+        document.getElementById(
+            "adminPassword"
+        ).value;
+
+    if (
+        username === "admin" &&
+        password === "admin123"
+    ) {
+
+        currentUser = {
+            username: "admin",
+            role: "admin"
+        };
+
+        setupPermissions();
+
+        closeAdminLogin();
+
+        document.getElementById(
+            "adminBtn"
+        ).innerText =
+            "Administrator Active";
+
+        loadRecords();
+
+        alert(
+            "Administrator Mode Activated"
+        );
+
+    } else {
+
+        alert(
+            "Invalid Administrator Credentials"
+        );
+
+    }
+}
 // =========================
 // PERMISSIONS
 // =========================
 
 function setupPermissions() {
 
-    if (!currentUser) return;
+    const saveBtn =
+        document.querySelector(
+            "button[onclick='saveRecord()']"
+        );
 
-    const saveBtn = document.querySelector(
-        "button[onclick='saveRecord()']"
-    );
+    const editBtns =
+        document.querySelectorAll(
+            ".edit-btn"
+        );
 
-    if (
-        currentUser.role === "user"
-    ) {
+    const deleteBtns =
+        document.querySelectorAll(
+            ".delete-btn"
+        );
 
-        if (saveBtn) {
+    if (currentUser.role === "user") {
+
+        if (saveBtn)
             saveBtn.style.display = "none";
-        }
 
-        document
-            .querySelectorAll(".delete-btn")
-            .forEach(btn => {
-                btn.style.display = "none";
-            });
+        editBtns.forEach(btn => {
+            btn.style.display = "none";
+        });
+
+        deleteBtns.forEach(btn => {
+            btn.style.display = "none";
+        });
 
     } else {
 
-        if (saveBtn) {
+        if (saveBtn)
             saveBtn.style.display = "inline-block";
-        }
 
-        document
-            .querySelectorAll(".delete-btn")
-            .forEach(btn => {
-                btn.style.display = "inline-block";
-            });
+        editBtns.forEach(btn => {
+            btn.style.display = "inline-block";
+        });
+
+        deleteBtns.forEach(btn => {
+            btn.style.display = "inline-block";
+        });
+
     }
+
 }
 
 // =========================
@@ -478,36 +551,15 @@ function setupPermissions() {
 
 window.onload = function () {
 
-    const savedUser = JSON.parse(
-        localStorage.getItem("currentUser")
-    );
+    currentUser = {
+        username: "user",
+        role: "user"
+    };
 
-    if (savedUser) {
-
-        currentUser = savedUser;
-
-        document.getElementById(
-            "loginPage"
-        ).style.display = "none";
-
-        document.getElementById(
-            "mainSystem"
-        ).style.display = "block";
-
-        setupPermissions();
-
-    } else {
-
-        document.getElementById(
-            "loginPage"
-        ).style.display = "flex";
-
-        document.getElementById(
-            "mainSystem"
-        ).style.display = "none";
-    }
+    setupPermissions();
 
     loadRecords();
+
 };
 
 function viewImage(src) {
