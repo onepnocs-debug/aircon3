@@ -27,39 +27,11 @@
 
 <body>
 
-<!-- LOGIN PAGE -->
 
-<div id="loginPage">
-
-<h1>❄ Air Conditioner Maintenance Management System</h1>
-
-<p>
-    Manage inspections, maintenance schedules,
-    repair records, and equipment monitoring.
-</p>
-
-<h2>System Login</h2>
-
-<input
-    type="text"
-    id="username"
-    placeholder="Username">
-
-<input
-    type="password"
-    id="password"
-    placeholder="Password">
-
-<button onclick="login()">
-    Login
-</button>
-
-
-</div>
 
 <!-- MAIN SYSTEM -->
 
-<div id="mainSystem" style="display:none;">
+<div id="mainSystem">
 
 
 <!-- HEADER -->
@@ -95,10 +67,22 @@
     </div>
 
     <div class="card">
-        <button onclick="logout()">
-            Logout
-        </button>
-    </div>
+
+    <button onclick="logout()">
+        Logout
+    </button>
+
+    <br><br>
+
+    <button
+        id="adminBtn"
+        onclick="showAdminLogin()">
+
+        Run as Administrator
+
+    </button>
+
+</div>
 
 </div>
 
@@ -229,6 +213,50 @@
     <img
         class="modal-content"
         id="fullImage">
+
+</div>
+
+    <div id="adminModal" class="modal">
+
+    <div
+        style="
+        background:white;
+        max-width:400px;
+        margin:120px auto;
+        padding:25px;
+        border-radius:15px;
+        ">
+
+        <h2 style="margin-bottom:15px;">
+            Run as Administrator
+        </h2>
+
+        <input
+            id="adminUsername"
+            placeholder="Username">
+
+        <br><br>
+
+        <input
+            type="password"
+            id="adminPassword"
+            placeholder="Password">
+
+        <br><br>
+
+        <button onclick="adminLogin()">
+            Login
+        </button>
+
+        <button
+            onclick="closeAdminLogin()"
+            style="background:#64748b;">
+
+            Cancel
+
+        </button>
+
+    </div>
 
 </div>
 
