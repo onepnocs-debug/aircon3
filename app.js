@@ -378,43 +378,6 @@ const accounts = [
 
 let currentUser = null;
 
-function login() {
-
-    const username =
-        document.getElementById("username").value;
-
-    const password =
-        document.getElementById("password").value;
-
-    const account = accounts.find(
-        a =>
-            a.username === username &&
-            a.password === password
-    );
-
-    if (!account) {
-        alert("Invalid Login");
-        return;
-    }
-
-    currentUser = account;
-
-    localStorage.setItem(
-        "currentUser",
-        JSON.stringify(account)
-    );
-
-    document.getElementById(
-        "loginPage"
-    ).style.display = "none";
-
-    document.getElementById(
-        "mainSystem"
-    ).style.display = "block";
-
-    setupPermissions();
-    loadRecords();
-}
 
 function logout() {
 
@@ -585,7 +548,7 @@ window.addEventListener("click", function (e) {
 
 });
 console.log("REACHED BOTTOM");
-window.login = login;
+
 window.logout = logout;
 window.saveRecord = saveRecord;
 window.editRecord = editRecord;
@@ -594,3 +557,7 @@ window.exportPDF = exportPDF;
 window.exportCSV = exportCSV;
 window.loadRecords = loadRecords;
 window.viewImage = viewImage;
+
+window.showAdminLogin = showAdminLogin;
+window.closeAdminLogin = closeAdminLogin;
+window.adminLogin = adminLogin;
